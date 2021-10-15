@@ -4,96 +4,28 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MainActivity">
+    tools:context=".MainActivity"
+    android:background="@drawable/karina_main">
 
-    <ImageView
-        android:id="@+id/iv_karina001"
+    <Button
+        android:id="@+id/btn_start"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:clickable="true"
-        android:focusable="true"
+        android:text="@string/btn_start"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        tools:src="@drawable/karina_001" />
+        app:layout_constraintVertical_bias="0.85" />
 
-    <ImageView
-        android:id="@+id/iv_karina002"
+    <Button
+        android:id="@+id/btn_record"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:clickable="true"
-        android:focusable="true"
-        app:layout_constraintStart_toEndOf="@+id/iv_karina001"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:src="@drawable/karina_002" />
-
-    <ImageView
-        android:id="@+id/iv_karina003"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:clickable="true"
-        android:focusable="true"
-        app:layout_constraintStart_toEndOf="@+id/iv_karina002"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:src="@drawable/karina_003" />
-
-    <ImageView
-        android:id="@+id/iv_karina004"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:clickable="true"
-        android:focusable="true"
-        app:layout_constraintStart_toStartOf="@+id/iv_karina001"
-        app:layout_constraintTop_toBottomOf="@+id/iv_karina001"
-        tools:src="@drawable/karina_004" />
-
-    <ImageView
-        android:id="@+id/iv_karina005"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:clickable="true"
-        android:focusable="true"
-        app:layout_constraintStart_toEndOf="@+id/iv_karina004"
-        app:layout_constraintTop_toBottomOf="@+id/iv_karina002"
-        tools:src="@drawable/karina_005" />
-
-    <ImageView
-        android:id="@+id/iv_karina006"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:clickable="true"
-        android:focusable="true"
-        app:layout_constraintStart_toEndOf="@+id/iv_karina005"
-        app:layout_constraintTop_toBottomOf="@+id/iv_karina003"
-        tools:src="@drawable/karina_006" />
-
-    <ImageView
-        android:id="@+id/iv_karina007"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:clickable="true"
-        android:focusable="true"
-        app:layout_constraintStart_toStartOf="@+id/iv_karina004"
-        app:layout_constraintTop_toBottomOf="@+id/iv_karina004"
-        tools:src="@drawable/karina_007" />
-
-    <ImageView
-        android:id="@+id/iv_karina008"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:clickable="true"
-        android:focusable="true"
-        app:layout_constraintStart_toEndOf="@+id/iv_karina007"
-        app:layout_constraintTop_toBottomOf="@+id/iv_karina005"
-        tools:src="@drawable/karina_008" />
-
-    <ImageView
-        android:id="@+id/iv_blank"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:clickable="true"
-        android:focusable="true"
-        app:layout_constraintStart_toEndOf="@+id/iv_karina008"
-        app:layout_constraintTop_toBottomOf="@+id/iv_karina006"
-        tools:src="@drawable/ic_launcher_background" />
-
+        android:text="@string/btn_record"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="@+id/btn_start"
+        app:layout_constraintStart_toStartOf="@+id/btn_start"
+        app:layout_constraintTop_toBottomOf="@+id/btn_start"
+        app:layout_constraintVertical_bias="0.25" />
 </androidx.constraintlayout.widget.ConstraintLayout>
