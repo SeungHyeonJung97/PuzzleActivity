@@ -5,6 +5,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.graphics.Point;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -33,6 +34,7 @@ public class PuzzleActivity extends AppCompatActivity {
     public TextView tv_timer;
     boolean toggle_timer = false;
     Handler mHandler;
+    int blank_index = 8;
 
 //    GestureDetector gesture;
 //    public float downX, downY, upX, upY;
@@ -56,18 +58,15 @@ public class PuzzleActivity extends AppCompatActivity {
         initProgress();
 
         for (int i = 0; i < iv.length; i++) {
+            int value_i = i;
             iv[i].setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     if (!toggle_timer) {
                         startTimerThread();
                     }
-
-                    ImageView imageView = (ImageView) v;
-                    ImageView blank = (ImageView) findViewById(R.id.iv_blank);
-
-                    if (Vert(imageView, blank) || Hori(imageView, blank)) {
-                        SwapImage(imageView, blank);
+                    if (Math.abs(blank_index - value_i) == 1 || Math.abs(blank_index - value_i) == 3) {
+                        SwapImage(value_i, blank_index);
                     }
                 }
             });
@@ -83,8 +82,8 @@ public class PuzzleActivity extends AppCompatActivity {
     }
 
     private void initProgress() {
-        pb_timer.setMax(10);
-        pb_timer.setProgress(10);
+        pb_timer.setMax(300);
+        pb_timer.setProgress(300);
     }
 
     private void startTimerThread() {
@@ -94,8 +93,9 @@ public class PuzzleActivity extends AppCompatActivity {
                 PuzzleActivity.this.runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        decreaseBar();
-
+                        if (pb_timer.getProgress() != 0) {
+                            decreaseBar();
+                        }
                     }
                 });
                 toggle_timer = true;
@@ -109,26 +109,30 @@ public class PuzzleActivity extends AppCompatActivity {
         new Thread() {
             @Override
             public void run() {
-                try {
+                if (!(Thread.currentThread().isInterrupted())) {
                     int currentProgress = pb_timer.getProgress();
                     if (currentProgress > 0) {
                         currentProgress = currentProgress - 1;
                     }
                     if (currentProgress <= 0) {
                         Log.d("Puzzle", "Game Over");
+                        this.interrupt();
                     }
                     pb_timer.setProgress(currentProgress);
 
                     /***
                      * 이 부분이 textview를 수정하는 부분입니다 !
                      */
-//                    Message message = new Message();
-//                    message.arg1 = (currentProgress / 60);
-//                    message.arg2 = (currentProgress - ((currentProgress / 60) * 60));
-//                    mHandler.sendMessage(message);
-                } catch (Exception e) {
-                    e.printStackTrace();
+                    Message message = new Message();
+                    message.arg1 = (currentProgress / 60);
+                    message.arg2 = (currentProgress - ((currentProgress / 60) * 60));
+                    mHandler.sendMessage(message);
                 }
+            }
+
+            @Override
+            public void interrupt() {
+                Log.d("interrupt", "issue");
             }
         }.start();
     }
@@ -191,42 +195,17 @@ public class PuzzleActivity extends AppCompatActivity {
                 .into(iv[8]);
     }
 
-    public void SwapImage(ImageView imageView, ImageView blank) {
+    public void SwapImage(int s_index, int b_index) {
         /***  blank( 빈 화면 ) imageView( 바꾸고자 하는 화면 )
          * 바꾸고자 하는 화면인 imageView의 각 좌표를 구하고, 각각 left, right, top, bottom에 담아놓은 후, imageView를 blank의 좌푯값으로 재구성한다.
          * 그리고나서, blank 또한 저장해놓은 left, right, top, bottom 값을 이용해 재구성한다.
          */
 
-        int Left = imageView.getLeft();
-        int Right = imageView.getRight();
-        int Top = imageView.getTop();
-        int Bottom = imageView.getBottom();
-
-        imageView.layout(blank.getLeft(), blank.getTop(), blank.getRight(), blank.getBottom());
-        blank.layout(Left, Top, Right, Bottom);
-
-        Log.d("Bottom : ", "" + Bottom);
-    }
-
-    public boolean Hori(ImageView imageView, ImageView blank) {
-        /***
-         * 가로로 이동할 때 사용하는 함수
-         * imageView의 top 값과 blank의 top 값을 비교한다. ( 같은 행인지 ? )
-         * imageView의 left 값과 blank의 left 값을 비교한 값이 1칸의 width값만큼을 넘어서지 않는지 검사한다. ( 1칸만 움직이는지 ? )
-         */
-        int cha_width = 0;
-        cha_width = imageView.getLeft() - blank.getLeft();
-        return (imageView.getTop() == blank.getTop() && (Math.abs(cha_width) < (imageView.getWidth() + 10)));
-    }
-
-    public boolean Vert(ImageView imageView, ImageView blank) {
-        /***
-         * 세로로 이동할 때 사용하는 함수
-         * imageView의 left 값과 blank의 left 값을 비교한다. ( 같은 열인지 ? )
-         * imageView의 left 값과 blank의 left 값을 비교한 값이 1칸의 height값만큼을 넘어서지 않는지 검사한다. ( 1칸만 움직이는지 ? )
-         */
-        int cha_height = 0;
-        cha_height = imageView.getTop() - blank.getTop();
-        return (imageView.getLeft() == blank.getLeft() && (Math.abs(cha_height) < (imageView.getHeight() + 10)));
+        Drawable temp = iv[s_index].getDrawable();
+        iv[s_index].setImageDrawable(iv[b_index].getDrawable());
+        iv[b_index].setImageDrawable(temp);
+        blank_index = s_index;
+        Log.d("blank_index", "" + b_index);
+        Log.d("select_index", "" + s_index);
     }
 }
