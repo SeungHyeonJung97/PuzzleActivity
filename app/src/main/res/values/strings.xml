@@ -2,4 +2,5 @@
     <string name="app_name">PuzzleActivity</string>
     <string name="btn_start">게임 시작</string>
     <string name="btn_record">기록 보기</string>
+    <string name="timer">%s : %s</string>
 </resources>

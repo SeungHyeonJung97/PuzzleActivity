@@ -1,24 +1,41 @@
 package com.example.puzzleactivity;
 
+import androidx.annotation.MainThread;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.graphics.Point;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.util.Log;
 import android.view.Display;
-import android.view.GestureDetector;
-import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+
+import org.w3c.dom.Text;
+
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class PuzzleActivity extends AppCompatActivity {
 
     // 이미지를 담을 배열
     ImageView iv[] = new ImageView[9];
-    GestureDetector gesture;
-    public float downX, downY, upX, upY;
+    ProgressBar pb_timer;
+    Timer timer;
+    TimerTask timerTask;
+    public TextView tv_timer;
+    boolean toggle_timer = false;
+    Handler mHandler;
+
+//    GestureDetector gesture;
+//    public float downX, downY, upX, upY;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,19 +50,87 @@ public class PuzzleActivity extends AppCompatActivity {
         // 구한 size를 ImageSettings에 넘겨주어, ImageSettings()에서 Puzzle의 Image를 Setting 한다.
         ImageSettings(size);
 
+        pb_timer = (ProgressBar) findViewById(R.id.pb_timer);
+        tv_timer = (TextView) findViewById(R.id.tv_timer);
+
+        initProgress();
+
         for (int i = 0; i < iv.length; i++) {
             iv[i].setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
+                    if (!toggle_timer) {
+                        startTimerThread();
+                    }
 
                     ImageView imageView = (ImageView) v;
                     ImageView blank = (ImageView) findViewById(R.id.iv_blank);
+
                     if (Vert(imageView, blank) || Hori(imageView, blank)) {
                         SwapImage(imageView, blank);
                     }
                 }
             });
         }
+
+        mHandler = new Handler(new Handler.Callback() {
+            @Override
+            public boolean handleMessage(@NonNull Message msg) {
+                tv_timer.setText(msg.arg1 + " : " + msg.arg2);
+                return true;
+            }
+        });
+    }
+
+    private void initProgress() {
+        pb_timer.setMax(10);
+        pb_timer.setProgress(10);
+    }
+
+    private void startTimerThread() {
+        timerTask = new TimerTask() {
+            @Override
+            public void run() {
+                PuzzleActivity.this.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        decreaseBar();
+
+                    }
+                });
+                toggle_timer = true;
+            }
+        };
+        timer = new Timer();
+        timer.schedule(timerTask, 0, 1000);
+    }
+
+    private void decreaseBar() {
+        new Thread() {
+            @Override
+            public void run() {
+                try {
+                    int currentProgress = pb_timer.getProgress();
+                    if (currentProgress > 0) {
+                        currentProgress = currentProgress - 1;
+                    }
+                    if (currentProgress <= 0) {
+                        Log.d("Puzzle", "Game Over");
+                    }
+                    pb_timer.setProgress(currentProgress);
+
+                    /***
+                     * 이 부분이 textview를 수정하는 부분입니다 !
+                     */
+//                    Message message = new Message();
+//                    message.arg1 = (currentProgress / 60);
+//                    message.arg2 = (currentProgress - ((currentProgress / 60) * 60));
+//                    mHandler.sendMessage(message);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }.start();
     }
 
 
@@ -119,6 +204,7 @@ public class PuzzleActivity extends AppCompatActivity {
 
         imageView.layout(blank.getLeft(), blank.getTop(), blank.getRight(), blank.getBottom());
         blank.layout(Left, Top, Right, Bottom);
+
         Log.d("Bottom : ", "" + Bottom);
     }
 
