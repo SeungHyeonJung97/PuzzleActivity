@@ -1,19 +1,17 @@
 package com.example.puzzleactivity;
 
-import androidx.annotation.MainThread;
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 
-import android.content.Context;
-import android.content.SharedPreferences;
+import android.annotation.SuppressLint;
+import android.content.Intent;
 import android.graphics.Point;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.Display;
 import android.view.View;
@@ -29,11 +27,6 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
-import org.json.JSONArray;
-import org.w3c.dom.Text;
-
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Random;
@@ -48,7 +41,7 @@ public class PuzzleActivity extends AppCompatActivity {
     private ProgressBar pb_timer;
     private Timer timer;
     private TimerTask timerTask;
-    private Button btn_check;
+    private Button btn_check, btn_move_to_record;
     private TextView tv_timer;
     private boolean toggle_timer = false;
     private boolean answer = false;
@@ -76,6 +69,7 @@ public class PuzzleActivity extends AppCompatActivity {
         pb_timer = (ProgressBar) findViewById(R.id.pb_timer);
         tv_timer = (TextView) findViewById(R.id.tv_timer);
         btn_check = (Button) findViewById(R.id.btn_check);
+        btn_move_to_record = (Button) findViewById(R.id.btn_move_to_record);
 
         mDatabase = FirebaseDatabase.getInstance().getReference();
 
@@ -102,8 +96,17 @@ public class PuzzleActivity extends AppCompatActivity {
                     }
                     if (isCorrect) {
                         answer = true;
-                        saverScore(count, pb_timer.getProgress());
-                        Toast.makeText(PuzzleActivity.this, "시도한 횟수" + count + "남은 시간" + pb_timer.getProgress() + "초", Toast.LENGTH_SHORT).show();
+                        saveScore(count, pb_timer.getProgress());
+                        btn_move_to_record.setVisibility(View.VISIBLE);
+                        btn_move_to_record.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                Intent intent = new Intent(PuzzleActivity.this, RecordActivity.class);
+                                startActivity(intent);
+                            }
+                        });
+                        Toast.makeText(PuzzleActivity.this, "시도한 횟수 : " + count + "번, 남은 시간 : " + pb_timer.getProgress() + "초", Toast.LENGTH_SHORT).show();
+
                     } else {
                         Toast.makeText(PuzzleActivity.this, "오답입니다 !", Toast.LENGTH_SHORT).show();
                     }
@@ -184,17 +187,17 @@ public class PuzzleActivity extends AppCompatActivity {
         mHandler = new Handler(new Handler.Callback() {
             @Override
             public boolean handleMessage(@NonNull Message msg) {
-                tv_timer.setText(msg.arg1 + " : " + msg.arg2);
+                tv_timer.setText(getString(R.string.timer,msg.arg1,msg.arg2));
                 return true;
             }
         });
     }
 
-    private void saverScore(int count, int time) {
+    private void saveScore(int count, int time) {
+
         Record record = new Record(count, time);
         Calendar calendar = Calendar.getInstance();
         Date date = calendar.getTime();
-        Log.d("date",""+(date.getMonth()+1)+"/"+date.getDay()+"/"+date.getHours()+":"+date.getMinutes());
         String key = "" + (date.getMonth()+1) + "" + date.getDay() + "" + date.getHours() + "" + date.getMinutes();
 
         mDatabase.child("Record").child(key).setValue(record)

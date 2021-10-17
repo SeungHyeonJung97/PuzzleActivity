@@ -2,6 +2,8 @@
     <string name="app_name">PuzzleActivity</string>
     <string name="btn_start">게임 시작</string>
     <string name="btn_record">기록 보기</string>
-    <string name="timer">%s : %s</string>
+    <string name="timer">%d : %d</string>
     <string name="before_start">시작 버튼을 눌러주세요 !</string>
+    <string name="intro">Loading ...</string>
+    <string name="btn_move_to_record">기록 확인하기</string>
 </resources>
